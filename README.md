@@ -110,13 +110,14 @@ Jangan pernah percaya data kontrol akses yang dikirim dari client (URL, Cookies,
 
 Object-Level Access Control:
 Setiap ada request masuk ke database, validasi apakah user yang sedang aktif session-nya (auth()->user()->id) bener-bener pemilik dari data yang diminta.
-
+```
 PHP
 // Contoh di Backend (Laravel)
 $invoice = Invoice::find($request->id);
 if ($invoice->user_id !== auth()->user()->id) {
     return response()->json(['error' => 'Unauthorized'], 403);
 }
+```
 Global Middleware Otorisasi:
 Terapkan deny-by-default. Semua route harus terkunci di awal, baru dibuka secara spesifik untuk role tertentu.
 
