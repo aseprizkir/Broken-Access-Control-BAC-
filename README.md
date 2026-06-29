@@ -4,7 +4,7 @@
 
 Dokumentasi pribadi hasil *hunting*, nemu *logic flaw* di berbagai aplikasi, kayak aplikasi dinas/pemerintah, sistem internal kampus sampai startup SaaS besar. btw BAC saat ini masih kokoh di peringkat #1 OWASP Top 10 karena emang selalu lolos dari *automated scanner*.
 
-## 🧠Definisi Singkat
+## Definisi Singkat
 Broken Access Control (BAC) tuh terjadi ketika aplikasi gagal membatasi hak akses *user* sesuai dengan *role* atau otorisasi yang seharusnya. Lu bisa ngelihat, ngubah, atau ngehapus data milik orang lain, atau bahkan naik kasta jadi Admin (*Privilege Escalation*).
 
 ---
