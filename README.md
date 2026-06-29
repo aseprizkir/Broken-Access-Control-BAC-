@@ -58,17 +58,17 @@ Note: Kadang parameter current_password malah gak divalidasi sama backend kalo p
 
 ### 🏰 3. Path Authorization Bypass (/admin/dashboard)
 Kasus di mana lu nyoba forced browsing ke halaman admin tanpa login, atau login make akun role rendah (User biasa). Di lapangan, gue sering nemu dua situasi unik ini apalagi app hasil vibe coding yang make ai murahan:
-
+```
 Situasi A: Cuma Bisa Lihat Doang (Read-Only Access)
 Lu langsung coba akses https://target.com/admin/dashboard biasanya langsung kebuka. dari situ bisa liat grafik penjualan, total user, bahkan log sistem, tapi pas lu klik tombol "Delete User" atau "Add Admin", aksinya gagal (Error 403 / 401).
-
+```
 Kenapa Bisa? Developer masang middleware / filter otorisasi cuma di fungsi-fungsi pemroses data (POST/PUT/DELETE), tapi lupa masang middleware di fungsi routing utama yang nampilin halaman (GET).
 
 Dampak: Information Disclosure (Kebocoran data sensitif lewat dasbor).
-
+```
 Situasi B: Akses Full (Full CRUD Access / Takeover)
 Lu tembak /admin/dashboard atau endpoint API adminnya, halaman kebuka dan semua fitur modifikasi data berfungsi normal tanpa validasi token sama sekali.
-
+```
 Kenapa Bisa? Sering terjadi karena developer pake routing grup, tapi folder /admin/ lupa dimasukin ke dalam security middleware array di source code-nya (misal di Laravel atau CodeIgniter lupa pasang ->middleware(['auth', 'admin'])).
 
 Trick Bypass Tambahan via Header / Path Manipulation:
@@ -85,10 +85,10 @@ X-Rewrite-URL: /admin/dashboard
 ```
 ### 🔐4. API tidak memberlakukan validasi server-side terhadap immutable fields
 Jujur gw sebenernya ga yakin ini namanya kerentanan apa, tapi gw masukin ke list BAC karna kasusnya lumayan simpel tapi berhubungan sama cacat logika aplikasi
-
+```
 Contohnya:
 ada menu biodata, isinya pasti ya form nama, ttl, atau mungkin biodata, nah terkadang di instansi seperti pemerintah atau kampus, kolom/form seperti nama/nim atau TTL tuh gabisa kita edit, tapiii pas kita intercept request nya make burpsuite, kolom/form yang sifatnya immutable/terkunci/gabisa diedit tadi tuh bisa diedit dan pas kita send ternyata kolom tadi isinya bisa berubah, bug kek gini lumayan, untuk reward sekitar 700k dengan severity *medium*.
-
+```
 catatan: ini terjadi karna validasi hanya diterapkan disisi front end, bukan disisi backend, jadi ketika diwebsite form pasti gabisa diedit karna ada validasi dari front end, tapi ketika tembak langsung ke backend, eh diterima aja tanpa validasi, btw biasanya kalau kek gini bisa diisi xss stored lohh, 
 
 --- 
