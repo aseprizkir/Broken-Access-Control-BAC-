@@ -1,10 +1,8 @@
-🔓Broken Access Control (BAC)
+### 🔓Broken Access Control (BAC)
 
 "WAF mungkin bisa nahan SQLi & XSS, tapi WAF gak bakal paham logika bisnis aplikasi. nah di situlah Broken Access Control ambil peran."
 
 Dokumentasi pribadi hasil *hunting*, nemu *logic flaw* di berbagai aplikasi, kayak aplikasi dinas/pemerintah, sistem internal kampus sampai startup SaaS besar. btw BAC saat ini masih kokoh di peringkat #1 OWASP Top 10 karena emang selalu lolos dari *automated scanner*.
-
----
 
 ## 🧠Definisi Singkat
 Broken Access Control (BAC) tuh terjadi ketika aplikasi gagal membatasi hak akses *user* sesuai dengan *role* atau otorisasi yang seharusnya. Lu bisa ngelihat, ngubah, atau ngehapus data milik orang lain, atau bahkan naik kasta jadi Admin (*Privilege Escalation*).
@@ -16,11 +14,12 @@ Broken Access Control (BAC) tuh terjadi ketika aplikasi gagal membatasi hak akse
 ### 1. IDOR Klasik via URL Parameter (B2A / Horizontal PrivEsc)
 Skenario paling dasar tapi masih sering kena. Aplikasi mengandalkan input dari *client-side* (URL/Parameter) buat nentuin data siapa yang mau ditarik, tapi ga nge-cek apakah *user* yang *login* punya hak atas ID tersebut.
 
+```
 * **URL Normal Lu:** `https://target.com/dashboard/upload/ktpuser?id=20045`
 * **Manipulasi (IDOR):** Ubah `id` ke barisan angka lain.
   `https://target.com/profile/upload/ktpuser?id=20044`
   `https://target.com/profile/upload/ktpuser?id=20046`
-
+```
 **Varian IDOR di API Endpoint (2026):**
 Banyak aplikasi modern pake REST API atau GraphQL. Cek *request* di Burp Suite:
 ```http
@@ -30,7 +29,7 @@ GET /api/v2/users/1029 HTTP/1.1 --> Ganti 'me' jadi ID target buat nyomot data o
 
 ### 🚀 2. IDOR Privilege Escalation via Fitur Ganti Password
 Ini high-risk banget. Fitur ganti password atau reset akun yang cacat logika, di mana parameter identitas user dilempar di dalam request body (JSON/Form) dan bisa diganti secara paksa (Parameter Tampering).
-
+```
 Request Asli (Akun Attacker, ID: 551):
 
 HTTP
@@ -45,14 +44,16 @@ Authorization: Bearer <token_attacker_lu>
   "password": "Hacked2026!"
 }
 Eksploitasi (Mengubah Password Akun Korban/Admin, ID: 1):
+```
 Cukup ganti "user_id" jadi milik target. Kalo backend cuma nge-validasi token JWT lu aktif (tanpa mencocokkan isi token dengan "user_id" di body), password target bakal langsung berubah!
-
+```
 JSON
 {
   "user_id": 1,
   "current_password": "password_attacker", 
   "new_password": "Hacked2026!"
 }
+```
 Note: Kadang parameter current_password malah gak divalidasi sama backend kalo parameter user_id diubah, atau bisa langsung dihapus barisnya dari JSON. btw ga cuma bagian password, kadang pas update biodata atau semua request post kalau ada param id layak dicoba tuh Idor kek gini, siapa tau hoki ya.
 
 ### 🏰 3. Path Authorization Bypass (/admin/dashboard)
@@ -72,7 +73,7 @@ Kenapa Bisa? Sering terjadi karena developer pake routing grup, tapi folder /adm
 
 Trick Bypass Tambahan via Header / Path Manipulation:
 Kalo halaman /admin/dashboard nge-block lu (403), coba bypass pake teknik path traversal atau kustom header:
-
+```
 HTTP
 GET /admin/dashboard HTTP/1.1  --> (403 Forbidden)
 
@@ -81,7 +82,7 @@ GET /./admin/dashboard HTTP/1.1
 GET /admin/dashboard/..;/ HTTP/1.1
 X-Original-URL: /admin/dashboard
 X-Rewrite-URL: /admin/dashboard
-
+```
 ### 🔐4. API tidak memberlakukan validasi server-side terhadap immutable fields
 Jujur gw sebenernya ga yakin ini namanya kerentanan apa, tapi gw masukin ke list BAC karna kasusnya lumayan simpel tapi berhubungan sama cacat logika aplikasi
 
@@ -90,6 +91,7 @@ ada menu biodata, isinya pasti ya form nama, ttl, atau mungkin biodata, nah terk
 
 catatan: ini terjadi karna validasi hanya diterapkan disisi front end, bukan disisi backend, jadi ketika diwebsite form pasti gabisa diedit karna ada validasi dari front end, tapi ketika tembak langsung ke backend, eh diterima aja tanpa validasi, btw biasanya kalau kek gini bisa diisi xss stored lohh, 
 
+--- 
 ### 🛡️ Checklist Nyari Celah BAC & IDOR (Buat Pemula)
 [ ] Bikin 2 Akun Berbeda Level: Akun A (Admin/High Priv) dan Akun B (User biasa/Low Priv).
 
@@ -100,6 +102,8 @@ catatan: ini terjadi karna validasi hanya diterapkan disisi front end, bukan dis
 [ ] Uji Parameter di Body: Cek setiap parameter user_id, owner_id, account_number, atau email yang dikirim lewat JSON POST request.
 
 [ ] Akses Tanpa Header Auth: Drop header Authorization: Bearer atau hapus Cookie di Burp Suite, lalu jalankan request ke panel sensitif untuk cek forced browsing.
+
+---
 
 ### 🔐 Cara Aman (Buat Developer)
 Jangan pernah percaya data kontrol akses yang dikirim dari client (URL, Cookies, Body).
