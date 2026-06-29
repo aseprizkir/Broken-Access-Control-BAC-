@@ -118,12 +118,12 @@ if ($invoice->user_id !== auth()->user()->id) {
     return response()->json(['error' => 'Unauthorized'], 403);
 }
 ```
-Global Middleware Otorisasi:
+1. Global Middleware Otorisasi:
 Terapkan deny-by-default. Semua route harus terkunci di awal, baru dibuka secara spesifik untuk role tertentu.
-
-Pake Non-Predictable ID (UUID):
+2. Pake Non-Predictable ID (UUID):
 Ganti auto-increment ID (1, 2, 3) pake UUID (de305d54-75b4-431b-adb2-eb6b9e546013). Ini menutup celah mass-fuzzing IDOR, walaupun logic-nya tetep harus diperbaiki.
+
 ---
 
 ###✍️ Catatan Akhir
-"Menemukan IDOR/BAC itu masalah ketelitian membaca alur aplikasi (Business Logic). Jangan cuma fokus sama apa yang tampil di layar, tapi lihat apa yang dikirim di belakang layar (Burp History)."
+"Menemukan IDOR/BAC itu masalah ketelitian membaca alur aplikasi (Business Logic). Jangan cuma fokus sama apa yang tampil di layar, tapi lihat apa yang dikirim di belakang layar (Burp History) sekian matur thankyou."
