@@ -125,5 +125,5 @@ Ganti auto-increment ID (1, 2, 3) pake UUID (de305d54-75b4-431b-adb2-eb6b9e54601
 
 ---
 
-###✍️ Catatan Akhir
-"Menemukan IDOR/BAC itu masalah ketelitian membaca alur aplikasi (Business Logic). Jangan cuma fokus sama apa yang tampil di layar, tapi lihat apa yang dikirim di belakang layar (Burp History) sekian matur thankyou."
+### Catatan Akhir
+"Menemukan IDOR/BAC itu harus teliti baca alur aplikasi (Business Logic). Jangan cuma fokus sama apa yang tampil di layar, tapi lihat apa yang dikirim di belakang layar (Burp History) . sekian matur thankyou."
